@@ -145,3 +145,6 @@ def svm_train(data,labels,loss,penalty,alpha,max_iter,tol):
     train_acc = correct_train/labels.size
 
     return train_acc, clf
+
+def average_error(error_vec):
+    return np.sum(error_vec)/error_vec.size
