@@ -8,6 +8,7 @@
 
 
 import numpy as np
+from sklearn.feature_extraction.text import TfidfTransformer
 
 def load_data(filename):
     """
@@ -57,6 +58,10 @@ def process_training_data(data, normalize='None', add_bias=True):
         row_sum = np.sum(Xorig, axis=1).T
         row_sum[row_sum == 0] = 1
         Xorig = (Xorig.T/row_sum).T
+    elif (normalize == 'tfidf'):
+        transformer = TfidfTransformer(smooth_idf=False)
+        X = transformer.fit_transform(counts)
+        X.toarray()
     elif (normalize != 'None'):
         print('Invalid normalization keyword. Defaulting to no normalization')
     
@@ -99,7 +104,10 @@ def process_testing_data(data, normalize='None', add_bias=True):
         data = (data.T/row_sum).T
     elif (normalize != 'None'):
         print('Invalid normalization keyword. Defaulting to no normalization')
-    
+    elif (normalize == 'tfidf'):
+        transformer = TfidfTransformer(smooth_idf=False)
+        X = transformer.fit_transform(counts)
+        X.toarray()    
     if (add_bias == True):
         # Append column of ones to original data
         X = np.ones((N,D+1))
