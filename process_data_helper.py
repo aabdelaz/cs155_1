@@ -2,12 +2,13 @@
 # CS/CNS/EE 155 2018
 # Project 1
 #
-# Author:       Ameera Abdelaziz, Andrew Taylor
+# Author:       Ameera Abdelaziz, Andrew Taylor, Jiexin Chen
 # Description:  Project 1 Data Processing Helper
 ########################################
 
 
 import numpy as np
+from sklearn.feature_extraction.text import TfidfTransformer
 
 def load_data(filename):
     """
@@ -57,9 +58,12 @@ def process_training_data(data, normalize='None', add_bias=True):
         row_sum = np.sum(X, axis=1).T
         row_sum[row_sum == 0] = 1
         X = (X.T/row_sum).T
+    elif (normalize == 'tfidf'):
+        transformer = TfidfTransformer(smooth_idf=False)
+        X = transformer.fit_transform(counts)
+        X.toarray()
     elif (normalize != 'None'):
         print('Invalid normalization keyword. Defaulting to no normalization')
-    
     if (add_bias == True):
         # Append column of ones to original data
         X_padded = np.ones((N,D))
@@ -98,6 +102,10 @@ def process_testing_data(data, normalize='None', add_bias=True):
     elif (normalize == 'l1'):
         row_sum = np.sum(data, axis=1).T
         data = (data.T/row_sum).T
+    elif (normalize == 'tfidf'):
+        transformer = TfidfTransformer(smooth_idf=False)
+        X = transformer.fit_transform(counts)
+        X.toarray() 
     elif (normalize != 'None'):
         print('Invalid normalization keyword. Defaulting to no normalization')
     
