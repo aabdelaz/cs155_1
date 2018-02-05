@@ -9,6 +9,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.linear_model as skl
+import sklearn.model_selection as skl_model_selection
 import process_data_helper as pdh
 
 # These two functions can be used to train a linear classififer with a variety of different loss functions and regularization, and evaluate the accuracy on a classification test data set. 
@@ -102,14 +103,13 @@ def svm_kfold_eval(data,labels,folds,loss,penalty,alpha,max_iter,tol):
         train_acc: A (folds,1) array of training accuracies from each possible KFold.
         test_acc: A (folds,1) array of testing accuracies from each possible KFold.
     '''
-
     # Produce sets of indices with KFold.
-    kf = Kfold(folds)
+    kf = skl_model_selection.KFold(folds)
     inds = [ind for ind in kf.split(data,labels)]
     
     # Set up matrices to store training and testing errors.
-    train_acc_mat = np.array((folds,1))
-    test_acc_mat = np.array((folds,1))
+    train_acc_mat = np.empty((folds,))
+    test_acc_mat = np.empty((folds,))
     
     # Iterate through the KFolds
     
@@ -123,12 +123,10 @@ def svm_kfold_eval(data,labels,folds,loss,penalty,alpha,max_iter,tol):
         y_test = labels[test_ind]
         
         # Fit a classifier and evaluate its performance
-        svm, train_acc, test_acc = svm_general(X_train,y_train,X_test,y_test,loss,penalty,alpha,max_iter,tol):
+        svm, train_acc, test_acc = svm_general(X_train,y_train,X_test,y_test,loss,penalty,alpha,max_iter,tol)
     
         # Store errors
         train_acc_mat[k] = train_acc
         test_acc_mat[k] = test_acc
 
     return train_acc_mat, test_acc_mat
-
-

@@ -55,6 +55,7 @@ def process_training_data(data, normalize='None', add_bias=True):
         Xorig = (Xorig - mean)/sigma
     elif (normalize == 'l1'):
         row_sum = np.sum(Xorig, axis=1).T
+        row_sum[row_sum == 0] = 1
         Xorig = (Xorig.T/row_sum).T
     elif (normalize != 'None'):
         print('Invalid normalization keyword. Defaulting to no normalization')
@@ -106,6 +107,3 @@ def process_testing_data(data, normalize='None', add_bias=True):
         data = X
     
     return data
-
-
-
