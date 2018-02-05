@@ -106,3 +106,42 @@ def svm_kfold_eval(data,labels,folds,loss,penalty,alpha,max_iter,tol):
         test_acc_mat[k] = test_acc
 
     return train_acc_mat, test_acc_mat, svm
+
+def svm_train(data,labels,loss,penalty,alpha,max_iter,tol):
+    '''
+    Evaluate training and testing accuracy over a full data set, and return the classifier.
+    
+    Inputs:
+        data: An (N,D) array of feature data
+        labels: An (N,1) array of label data
+        loss: A string with the type of loss to be used in the SVM.
+        penalty: A string with the type of regression to be used with the SVM.
+        alpha: A scalar value with the regression penalty coefficient.
+        max_iter: An integer number containing the maximum number of iterations.
+        tol: A float containing the tolerance on the optimization method. 
+        
+    Outputs:
+        train_acc: A scalar value of training accuracy
+        svm: A linear classifier model.
+    '''
+    # Create a classifier
+    clf = skl.SGDClassifier(loss = loss, penalty = penalty, alpha = alpha, max_iter = max_iter, tol = tol)
+    
+    # Train it
+    clf.fit(data,labels)
+    
+    # Compute training error
+    correct_train = 0
+    
+    # Get a vector of predictions
+    train_predictions = clf.predict(data)
+    
+    # Iterave over all of the predictions
+    for i in range(labels.size):
+        if(train_predictions[i] == labels[i]):
+            correct_train = correct_train+1
+    
+    # Compute the accuracy as number of correct classifications over total number of test data points.
+    train_acc = correct_train/labels.size
+
+    return train_acc, clf
