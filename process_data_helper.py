@@ -60,8 +60,8 @@ def process_training_data(data, normalize='None', add_bias=True):
         X = (X.T/row_sum).T
     elif (normalize == 'tfidf'):
         transformer = TfidfTransformer(smooth_idf=False)
-        X = transformer.fit_transform(counts)
-        X.toarray()
+        X = transformer.fit_transform(X)
+        X = X.toarray()
     elif (normalize != 'None'):
         print('Invalid normalization keyword. Defaulting to no normalization')
     if (add_bias == True):
@@ -104,8 +104,8 @@ def process_testing_data(data, normalize='None', add_bias=True):
         data = (data.T/row_sum).T
     elif (normalize == 'tfidf'):
         transformer = TfidfTransformer(smooth_idf=False)
-        X = transformer.fit_transform(counts)
-        X.toarray() 
+        X = transformer.fit_transform(X)
+        X = X.toarray()
     elif (normalize != 'None'):
         print('Invalid normalization keyword. Defaulting to no normalization')
     
