@@ -129,4 +129,4 @@ def svm_kfold_eval(data,labels,folds,loss,penalty,alpha,max_iter,tol):
         train_acc_mat[k] = train_acc
         test_acc_mat[k] = test_acc
 
-    return train_acc_mat, test_acc_mat
+    return train_acc_mat, test_acc_mat, svm
