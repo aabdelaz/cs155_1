@@ -42,28 +42,29 @@ def process_training_data(data, normalize='None', add_bias=True):
     N, D = data.shape
     
     # Split X and Y.
-    Y, Xorig = np.split(data, [1], axis=1);
+    Y, X = np.split(data, [1], axis=1);
     
     if (normalize == 'stats'):
         # Standard deviation of each column of X.
-        sigma = np.std(Xorig, axis=0)
+        sigma = np.std(X, axis=0)
     
         # Mean of each column of X
-        mean = np.mean(Xorig, axis=0)
+        mean = np.mean(X, axis=0)
     
         # Normalize X
-        Xorig = (Xorig - mean)/sigma
+        X = (X - mean)/sigma
     elif (normalize == 'l1'):
-        row_sum = np.sum(Xorig, axis=1).T
+        row_sum = np.sum(X, axis=1).T
         row_sum[row_sum == 0] = 1
-        Xorig = (Xorig.T/row_sum).T
+        X = (X.T/row_sum).T
     elif (normalize != 'None'):
         print('Invalid normalization keyword. Defaulting to no normalization')
     
     if (add_bias == True):
         # Append column of ones to original data
-        X = np.ones((N,D))
-        X[:,:-1] = Xorig
+        X_padded = np.ones((N,D))
+        X_padded[:,:-1] = X
+        X = X_padded
     
     return X, Y
 
@@ -126,7 +127,7 @@ def write_predictions(clf, X, filename):
     
     lines = ["Id,Prediction\n"]
     for i in range(Y.shape[0]):
-        lines.append(str(i) + ',' + str(int(Y[i])) + '\n')
+        lines.append(str(i+1) + ',' + str(int(Y[i])) + '\n')
 
     fh = open(filename, "w")
     fh.writelines(lines)
