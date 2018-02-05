@@ -45,10 +45,6 @@ def loss_eval(clf,X_train,y_train,X_test,y_test):
     train_predictions = clf.predict(X_train)
     test_predictions = clf.predict(X_test)
     
-    # Shift predictions to 0/1
-    train_predictions = predict_shift(train_predictions)
-    test_predictions = predict_shift(test_predictions)
-    
     # Iterave over all of the predictions
     for i in range(y_train.size):
         
@@ -64,26 +60,6 @@ def loss_eval(clf,X_train,y_train,X_test,y_test):
     test_acc = correct_test/y_test.size
     
     return train_acc, test_acc
-
-def predict_shift(predictions):
-    '''
-    Shift regression predictions to 0/1.
-    
-    Inputs:
-        predictions: A (N,1) array with predictions.
-        
-    Outputs:
-        predictions: A (N,1) array of predictions set to 0/1.
-    '''
-    
-    for i in range(predictions.size):
-        if(predictions[i] > 0.5):
-            predictions[i] = 1
-        else:
-            predictions[i] = 0
-  
-    return predictions
-
 
 def svm_kfold_eval(data,labels,folds,loss,penalty,alpha,max_iter,tol):
     '''
@@ -129,4 +105,4 @@ def svm_kfold_eval(data,labels,folds,loss,penalty,alpha,max_iter,tol):
         train_acc_mat[k] = train_acc
         test_acc_mat[k] = test_acc
 
-    return train_acc_mat, test_acc_mat, svm
+    return train_acc_mat, test_acc_mat
