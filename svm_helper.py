@@ -9,29 +9,126 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.linear_model as skl
+import process_data_helper as pdh
 
 # These two functions can be used to train a linear classififer with a variety of different loss functions and regularization, and evaluate the accuracy on a classification test data set. 
 
 def svm_general(X_train,y_train,X_test,y_test,loss,penalty,alpha,max_iter,tol):
     clf = skl.SGDClassifier(loss = loss, penalty = penalty, alpha = alpha, max_iter = max_iter, tol = tol)
     clf.fit(X_train,y_train)
-    accuracy = loss_eval(clf.coef_,X_test,y_test)
+     
+    train_acc,test_acc = loss_eval(clf,X_train,y_train,X_test,y_test)
     
-    return clf.coef_, accuracy
+    return clf, train_acc, test_acc
 
-def loss_eval(coefs,X_test,y_test):
+def loss_eval(clf,X_train,y_train,X_test,y_test):
+    '''
+    Evaluate the training and testing error.
     
-    correct = 0
-    for i in range(y_test.size):
+    Inputs:
+        clf: A trained classifier model
+        X_train: A (N1,D) array containing all of the training data.
+        y_train: A (N1,1) array containing all of the test data.
+        X_test: A (N2,D) array containing all of the test data.
+        y_test: A (N2,1) array containing all of the test labels.
         
-        val = np.dot(coefs,X_test[i,:])
-        if(val>0):
-            val = 1
-        elif(val<0):
-            val = 0
-        if(val==y_test[i]):
-                correct = correct + 1
+    Outputs:
+        train_acc: A scalar value with percentage of correct classifications on training set.
+        test_acc: A scalar value with percentage of correct classifications on training set.
+    '''
+    # Initialize a correct counter
+    correct_train = 0
+    correct_test = 0
     
-    accuracy = correct/y_test.size
+    # Get a vector of predictions
+    train_predictions = clf.predict(X_train)
+    test_predictions = clf.predict(X_test)
     
-    return accuracy
+    # Shift predictions to 0/1
+    train_predictions = predict_shift(train_predictions)
+    test_predictions = predict_shift(test_predictions)
+    
+    # Iterave over all of the predictions
+    for i in range(y_train.size):
+        
+        if(train_predictions[i] == y_train[i]):
+            correct_train = correct_train+1
+    
+    for j in range(y_test.size):
+        if(test_predictions[j] == y_test[j]):
+            correct_test = correct_test+1
+    
+    # Compute the accuracy as number of correct classifications over total number of test data points.
+    train_acc = correct_train/y_train.size
+    test_acc = correct_test/y_test.size
+    
+    return train_acc, test_acc
+
+def predict_shift(predictions):
+    '''
+    Shift regression predictions to 0/1.
+    
+    Inputs:
+        predictions: A (N,1) array with predictions.
+        
+    Outputs:
+        predictions: A (N,1) array of predictions set to 0/1.
+    '''
+    
+    for i in range(predictions.size):
+        if(predictions[i] > 0.5):
+            predictions[i] = 1
+        else:
+            predictions[i] = 0
+  
+    return predictions
+
+
+def svm_kfold_eval(data,labels,folds,loss,penalty,alpha,max_iter,tol):
+    '''
+    Evaluate training and testing accuracy over a number of data folds created using the Kfolds method.
+    
+    Inputs:
+        data: An (N,D) array of feature data
+        labels: An (N,1) array of label data
+        folds: An integer value for the number of folds to be used.
+        loss: A string with the type of loss to be used in the SVM.
+        penalty: A string with the type of regression to be used with the SVM.
+        alpha: A scalar value with the regression penalty coefficient.
+        max_iter: An integer number containing the maximum number of iterations.
+        tol: A float containing the tolerance on the optimization method. 
+        
+    Outputs:
+        train_acc: A (folds,1) array of training accuracies from each possible KFold.
+        test_acc: A (folds,1) array of testing accuracies from each possible KFold.
+    '''
+
+    # Produce sets of indices with KFold.
+    kf = Kfold(folds)
+    inds = [ind for ind in kf.split(data,labels)]
+    
+    # Set up matrices to store training and testing errors.
+    train_acc_mat = np.array((folds,1))
+    test_acc_mat = np.array((folds,1))
+    
+    # Iterate through the KFolds
+    
+    for k in range(folds):
+    
+        # Get set of indices, then extract data
+        train_ind, test_ind = inds[k]
+        X_train = data[train_ind]
+        y_train = labels[train_ind]
+        X_test = data[test_ind]
+        y_test = labels[test_ind]
+        
+        # Fit a classifier and evaluate its performance
+        svm, train_acc, test_acc = svm_general(X_train,y_train,X_test,y_test,loss,penalty,alpha,max_iter,tol):
+    
+        # Store errors
+        train_acc_mat[k] = train_acc
+        test_acc_mat[k] = test_acc
+
+    return train_acc_mat, test_acc_mat
+
+
