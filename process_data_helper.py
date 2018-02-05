@@ -107,3 +107,28 @@ def process_testing_data(data, normalize='None', add_bias=True):
         data = X
     
     return data
+
+def write_predictions(clf, X, filename):
+    '''
+    Predict labels of X using clf, and write to filename.
+    
+    Inputs:
+        clf: Classifier used to predict.
+        X: A (N, D) data array.
+        filename: Name of output file.
+        
+    Outputs:
+        X: A (N,D) array containing the normalized data
+        with a column of ones appended.
+    '''
+    Y = clf.predict(X)
+
+    
+    lines = ["Id,Prediction\n"]
+    for i in range(Y.shape[0]):
+        lines.append(str(i) + ',' + str(int(Y[i])) + '\n')
+
+    fh = open(filename, "w")
+    fh.writelines(lines)
+    fh.close()
+
