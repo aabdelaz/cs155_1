@@ -44,6 +44,7 @@ def process_training_data(data, normalize='None', add_bias=True):
     
     # Split X and Y.
     Y, X = np.split(data, [1], axis=1);
+    Y= Y.reshape((Y.shape[0],))
     
     if (normalize == 'stats'):
         # Standard deviation of each column of X.
