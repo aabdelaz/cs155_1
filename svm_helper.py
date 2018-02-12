@@ -17,7 +17,6 @@ import process_data_helper as pdh
 def svm_general(X_train,y_train,X_test,y_test,loss,penalty,alpha,max_iter,tol):
     clf = skl.SGDClassifier(loss = loss, penalty = penalty, alpha = alpha, max_iter = max_iter, tol = tol)
     clf.fit(X_train,y_train)
-     
     train_acc,test_acc = loss_eval(clf,X_train,y_train,X_test,y_test)
     
     return clf, train_acc, test_acc
